@@ -8,7 +8,7 @@ public class testArbolGeneral {
         a.recorridoPorNiveles();
         System.out.println();
         System.out.println("---------");
-        System.out.println("La altura del arbol general es:"+a.altura());
+        System.out.println("La altura del arbol general essss:"+a.altura());
         System.out.println("¿Incluye el string:"+dato+"?"+a.include(dato, 0));
         System.out.println("Se encontro en el nivel:"+a.nivel(dato));
         System.out.println("Ancho del arbol:"+a.ancho());
