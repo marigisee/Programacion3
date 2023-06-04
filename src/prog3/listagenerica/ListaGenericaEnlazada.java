@@ -217,6 +217,17 @@ public class ListaGenericaEnlazada<T> extends ListaGenerica<T> {
 
 	}
 */
+
+	public ListaGenerica<T> clonar() {
+		 ListaGenerica<T> nueva = new ListaGenericaEnlazada<T>();
+		 this.comenzar();
+		 while (!this.fin()) {
+			 nueva.agregarFinal(this.proximo());
+		 }
+		 return nueva;
+	}
+
+
 }
 
 

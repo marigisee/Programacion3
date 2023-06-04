@@ -92,4 +92,6 @@ public abstract class ListaGenerica<T> {
 	 * */
 	public abstract int tamanio();
 
+	public abstract ListaGenerica<T> clonar();
+
 }
