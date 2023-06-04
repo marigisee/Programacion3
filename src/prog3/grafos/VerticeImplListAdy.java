@@ -32,7 +32,11 @@ public class VerticeImplListAdy<T> implements Vertice<T> {
 	public int posicion() {
 		return posicion;
 	}
-	
+
+	/**
+	 * Lo utilizamos para grafos sin peso.
+	 * @param v
+	 */
 	public void conectar(Vertice<T> v){
 		conectar(v, 1);
 
@@ -82,4 +86,8 @@ public class VerticeImplListAdy<T> implements Vertice<T> {
 		posicion = pos; 
 	}
 
+	@Override
+	public String toString() {
+		return " dato=" + dato +"";
+	}
 }
