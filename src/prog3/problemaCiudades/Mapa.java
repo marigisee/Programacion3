@@ -6,10 +6,24 @@ import prog3.utiles.Recorridos;
 
 public class Mapa {
 
-    Grafo<String> mapaCiudades;
+    Grafo<String> grafo;
 
     //------ Ejercicio 6a ------//
     //------ devolverCamino ------//
+
+
+    public Mapa (Grafo<String> grafo) {
+        this.grafo = grafo;
+    }
+
+    public Grafo<String> getMapaCiudades() {
+        return grafo;
+    }
+
+    public void setMapaCiudades(Grafo<String> mapaCiudades) {
+        this.grafo = mapaCiudades;
+    }
+
 
     /**
      * Retorna la lista de ciudades que se deben atravesar para ir de ciudad1 a ciudad2 en caso
@@ -18,35 +32,46 @@ public class Mapa {
      * @param ciudad2 : ciudad destino
      * @return
      */
-    public ListaGenerica<String> devolverCamino(Grafo<String> grafo,String ciudad1, String ciudad2) {
-        ListaGenerica<String> Camino = new ListaGenericaEnlazada<String>();
+
+    public ListaGenerica<String> devolverCamino(String ciudad1, String ciudad2) {
         ListaGenerica<String> ListaAux = new ListaGenericaEnlazada<String>();
-        Camino.comenzar();
-        ListaGenerica<Vertice<String>> ciudades = grafo.listaDeVertices();
-        boolean[] visitados = new boolean[ciudades.tamanio()];
-        int i=0;
-        int posicion = 0;
-        boolean ciudad1Encontrada = false;
-        while (!(ciudad1Encontrada) & (i<visitados.length)){
-            if (ciudades.proximo().dato().equals(ciudad1)) {
-                ciudad1Encontrada=true;
-                ListaAux.agregarFinal(ciudad1);
-                visitados[i] = true;
+        if (!this.getMapaCiudades().esVacio()) {
+            Resultados r = new Resultados();
+            ListaGenerica<String> Camino = new ListaGenericaEnlazada<String>();
+            Camino.comenzar();
+            ListaGenerica<Vertice<String>> ciudades = this.getMapaCiudades().listaDeVertices();
+            boolean[] visitados = new boolean[ciudades.tamanio()];
+            int i = 0;
+            boolean ciudad1Encontrada = false;
+            while (!(ciudad1Encontrada) & (i < visitados.length)) {
+                if (ciudades.proximo().dato().equals(ciudad1)) {
+                    ciudad1Encontrada = true;
+                    ListaAux.agregarFinal(ciudad1);
+                    visitados[i] = true;
+                } else {
+                    i++;
+                }
+            }
+            //Cuando entra al DFS, va a arrancar desde la ciudad1//
+            DFS(this.getMapaCiudades(), r , ListaAux, visitados, i, ciudad1, ciudad2);
+            if (r.getFin()){
+                return r.getListaString();
             }
             else {
-                i++;}
+                r.getListaString().eliminar(ciudad1);
+                return r.getListaString();
+            }
         }
-        //Cuando entra al DFS, va a arrancar desde la ciudad1//
-        Camino = DFS(grafo,Camino,ListaAux, visitados, i, ciudad1, ciudad2);
-        return Camino;
+        else
+            return ListaAux;
     }
 
-    private ListaGenerica<String> DFS(Grafo<String> grafo,ListaGenerica<String> Camino,ListaGenerica<String> ListaAux, boolean[] visitados, int i, String ciudad1, String ciudad2) {
+    private void DFS(Grafo<String> grafo,Resultados r,ListaGenerica<String> ListaAux, boolean[] visitados, int i, String ciudad1, String ciudad2) {
         Vertice<String> v = grafo.listaDeVertices().elemento(i);
         Vertice<String> vDestino;
         ListaGenerica<Arista<String>> ady = grafo.listaDeAdyacentes(v);
         ady.comenzar();
-        while (!(ady.fin())) {
+        while (!(ady.fin())&&!(r.getFin())) {
             Arista<String> arista = ady.proximo();
             vDestino = arista.verticeDestino();
             i = arista.verticeDestino().posicion();
@@ -57,21 +82,30 @@ public class Mapa {
                 visitados[i] = true;
                 //Si encontro la ciudad 2, la agrego y no llama a la recursión
                 if (vDestino.dato().equals(ciudad2)) {
-                    Camino = (ListaAux.clonar());
+                    r.setListaString(ListaAux.clonar());
+                    r.setFin(true);
                 } else {
                     //Si no encontro la ciudad 2, seguimos recorriendo los adyacentes con el DFS
-                    Camino = DFS(grafo, Camino, ListaAux, visitados, i, ciudad1, ciudad2);
+                    DFS(grafo, r, ListaAux, visitados, i, ciudad1, ciudad2);
                     ListaAux.eliminar(vDestino.dato());
-                    visitados[i] = false;
                 }
             }
         }
-        return Camino;}
+    }
 
-    //------ Ejercicio 6b ------//
-    //------ devolverCamino ------//
+    /**
+     * Retorna la lista de ciudades que se deben atravesar para ir de ciudad1 a ciudad2 en caso
+     * que se pueda llegar, si no retorna la lista vacía.
+     * El recorrido devuelto no tiene en cuenta las ciudades contenidas en @param ciudades.
+     * @param ciudad1 : ciudad inicio
+     * @param ciudad2 : ciudad destino
+     * @param ciudades : lista que contiene la cantidad de ciudades que deben exceptuarse del recorrido
+     *
+     * @return Recorrido que cumple lo pedido
+     */
 
-    public ListaGenerica<String> devolverCaminoExceptuando (Grafo<String> grafo,String ciudad1, String ciudad2, ListaGenerica<String> ciudades) {
+
+    public ListaGenerica<String> devolverCaminoExceptuando (String ciudad1, String ciudad2, ListaGenerica<String> ciudades) {
         ListaGenerica<String> Camino = new ListaGenericaEnlazada<>();
         Camino.comenzar();
         ListaGenerica<String> ListaAux = new ListaGenericaEnlazada<>();
@@ -92,11 +126,11 @@ public class Mapa {
             }
         }
         if (ciudad1Encontrada) {
-            DFSExceptuando(grafo,ciudad1,ciudad2,ciudades,i,ListaAux,visitados,r);
+            DFSExceptuando(grafo,ciudad2,ciudades,i,ListaAux,visitados,r);
         }
     return r.getListaString();}
 
-    public void DFSExceptuando (Grafo<String> grafo, String ciudad1, String ciudad2, ListaGenerica<String> ciudades,
+    public void DFSExceptuando (Grafo<String> grafo, String ciudad2, ListaGenerica<String> ciudades,
                                int i, ListaGenerica<String> ListaAux, boolean[] visitados, Resultados r) {
           Vertice<String> v = grafo.listaDeVertices().elemento(i);
           ListaGenerica<Arista<String>> ady = grafo.listaDeAdyacentes(v);
@@ -123,7 +157,7 @@ public class Mapa {
                   else {
                       i = vDestino.posicion();
                       visitados[i] = true;
-                      DFSExceptuando(grafo, ciudad1, ciudad2, ciudades, i, ListaAux, visitados,r);
+                      DFSExceptuando(grafo, ciudad2, ciudades, i, ListaAux, visitados,r);
                       visitados[i] = false;
                       ListaAux.eliminar(vDestino.dato());
                   }
@@ -131,4 +165,76 @@ public class Mapa {
           }
     }
 
+    /**
+     *     El método caminoMasCorto(String ciudad1, String ciudad2): ListaGenerica<String> //
+     *     Retorna la lista de ciudades que forman el camino más corto para llegar de ciudad1 a
+     *     ciudad2, si no existe camino retorna la lista vacía. (Las rutas poseen la distancia). (Sin tener
+     *     en cuenta el combustible).
+     *
+     */
+
+    public ListaGenerica<String> caminoMasCorto(String ciudad1, String ciudad2){
+        ListaGenerica<String> listaAux = new ListaGenericaEnlazada<>();
+        if (!this.grafo.esVacio()) {
+            boolean[] visitados = new boolean[this.grafo.listaDeVertices().tamanio()];
+            boolean encontroCiudad1 = false;
+
+            ListaGenerica<Vertice<String>> list = this.grafo.listaDeVertices();
+
+            int i = 0;
+
+            //Buscamos si está la ciudad1 en el grafo//
+
+            while (!(encontroCiudad1) && (i < visitados.length)) {
+                if (list.elemento(i).dato().equals(ciudad1)) {
+                    encontroCiudad1 = true;
+                } else {
+                    i++;
+                }
+            }
+            if (encontroCiudad1) {
+
+                //Si la encontró, entonces creamos lo necesario para comenzar el recorrido DFS
+
+                Resultados r = new Resultados();
+                listaAux.agregarFinal(ciudad1);
+                visitados[i] = true;
+                caminoMasCortoDFS(grafo,ciudad2,r, i,0,listaAux,visitados);
+                System.out.println("La distancia total:"+r.getMin());
+                return r.getListaString();
+            } else {
+
+                //Si no la encontró, entonces devolvemos listaAux que está vacia//
+
+                return listaAux;
+            }
+
+        }
+        else
+            return listaAux;
+    }
+
+
+    private static void caminoMasCortoDFS (Grafo<String> grafo, String ciudad2, Resultados r, int i, int distancia, ListaGenerica<String> listaAux, boolean[] visitados) {
+        visitados[i] = true;
+        Vertice<String> v = grafo.listaDeVertices().elemento(i);
+        if (v.dato().equals(ciudad2) && distancia < r.getMin()) {
+                r.setListaString(listaAux.clonar());
+                r.setMin(distancia);
+        }
+        else {
+            ListaGenerica<Arista<String>> ady = grafo.listaDeAdyacentes(v);
+            ady.comenzar();
+            while (!ady.fin()){
+                Arista<String> arista = ady.proximo();
+                int j = arista.verticeDestino().posicion();
+                if (!visitados[j]) {
+                    listaAux.agregarFinal(arista.verticeDestino().dato());
+                    caminoMasCortoDFS(grafo,ciudad2,r, j,distancia+arista.peso(),listaAux,visitados);
+                    listaAux.eliminarEn(listaAux.tamanio()-1);
+                    visitados[j] = false;
+                }
+            }
+        }
+    }
 }
