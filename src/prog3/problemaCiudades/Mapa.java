@@ -8,9 +8,6 @@ public class Mapa {
 
     Grafo<String> grafo;
 
-    //------ Ejercicio 6a ------//
-    //------ devolverCamino ------//
-
 
     public Mapa (Grafo<String> grafo) {
         this.grafo = grafo;
@@ -170,12 +167,11 @@ public class Mapa {
      *     Retorna la lista de ciudades que forman el camino más corto para llegar de ciudad1 a
      *     ciudad2, si no existe camino retorna la lista vacía. (Las rutas poseen la distancia). (Sin tener
      *     en cuenta el combustible).
-     *
      */
 
     public ListaGenerica<String> caminoMasCorto(String ciudad1, String ciudad2){
         ListaGenerica<String> listaAux = new ListaGenericaEnlazada<>();
-        if (!this.grafo.esVacio()) {
+        if (!this.grafo.esVacio() && !(this.grafo==null)) {
             boolean[] visitados = new boolean[this.grafo.listaDeVertices().tamanio()];
             boolean encontroCiudad1 = false;
 
@@ -210,14 +206,29 @@ public class Mapa {
             }
 
         }
-        else
+
+           //Si el grafo está vacio, devolvemos una lista vacia//
+
             return listaAux;
     }
 
-
+    /**
+     * Recorrido DFS del grafo en busca del camino con menor distancia hacia ciudad2.
+     * @param grafo : grafo
+     * @param ciudad2 : string que contiene la ciudad2
+     * @param r : objeto Resultados que contiene la listaGeneral resultado.
+     * @param i : posición del vértice actual
+     * @param distancia : variable distancia que contiene la suma de las distancias
+     * @param listaAux : lista auxiliar con la que iremos recorriendo el grafo
+     * @param visitados : vector booleano
+     */
     private static void caminoMasCortoDFS (Grafo<String> grafo, String ciudad2, Resultados r, int i, int distancia, ListaGenerica<String> listaAux, boolean[] visitados) {
         visitados[i] = true;
         Vertice<String> v = grafo.listaDeVertices().elemento(i);
+
+        //Consultamos si el vértice actual es ciudad2 y si además la distancia entre ciudad1 hasta el vértice actual
+        //Es menor que la almacenada en la variable r
+
         if (v.dato().equals(ciudad2) && distancia < r.getMin()) {
                 r.setListaString(listaAux.clonar());
                 r.setMin(distancia);
@@ -225,16 +236,88 @@ public class Mapa {
         else {
             ListaGenerica<Arista<String>> ady = grafo.listaDeAdyacentes(v);
             ady.comenzar();
+
+            //Recorremos la lista de adyacentes del vértice actual
+
             while (!ady.fin()){
                 Arista<String> arista = ady.proximo();
                 int j = arista.verticeDestino().posicion();
+
+                //Si el vértice destino no fue visitado, llamamos a la recursión.
+
                 if (!visitados[j]) {
+
+                    //Agregamos el vDestino a la listaAux
                     listaAux.agregarFinal(arista.verticeDestino().dato());
+
+                    //A la recursión el enviamos la distancia calculada hasta ahora + la distancia entre el vértice actual y el vértice destino.
+                    //Además le enviamos la posición del vértice destino en el vector visitados.
                     caminoMasCortoDFS(grafo,ciudad2,r, j,distancia+arista.peso(),listaAux,visitados);
+
+                    //Eliminamos con eliminarEn porque sino no funciona.
                     listaAux.eliminarEn(listaAux.tamanio()-1);
                     visitados[j] = false;
+
                 }
             }
         }
+    }
+
+
+/**
+ * El método caminoSinCargarCombustible(String ciudad1, String ciudad2, int
+ * tanqueAuto): ListaGenerica<String> // Retorna la lista de ciudades que forman un camino
+ * para llegar de ciudad1 a ciudad2. El auto no debe quedarse sin combustible y no puede
+ * cargar. Si no existe camino retorna la lista vacía
+ */
+
+    public ListaGenerica<String> caminoSinCargarCombustible (String ciudad1, String ciudad2, int tanqueAuto) {
+        Resultados r = new Resultados();
+        if (this.grafo.esVacio()) {
+            return r.getListaString();
+        } else {
+            boolean[] visitados = new boolean[getMapaCiudades().listaDeVertices().tamanio()];
+            boolean encontroCiudad1 = false;
+            int i = 0;
+            while (!encontroCiudad1 && i < visitados.length) {
+                if (this.grafo.listaDeVertices().elemento(i).dato().equals(ciudad1)) {
+                    encontroCiudad1 = true;
+                } else i++;
+            }
+            if (encontroCiudad1) {
+                ListaGenerica<String> listaAux = new ListaGenericaEnlazada<>();
+                listaAux.agregarFinal(ciudad1);
+                visitados[i] = true;
+                CombustibleDFS(getMapaCiudades(), ciudad2, i, listaAux, visitados, r, tanqueAuto, 0);
+            }
+        }
+        return r.getListaString();
+    }
+
+    /*
+    *
+    * */
+    private void CombustibleDFS (Grafo<String> grafo, String ciudad2, int i, ListaGenerica<String> listaAux, boolean[] visitados, Resultados r,int tanqueAuto,int cargaActual) {
+        visitados[i] = true;
+        Vertice<String> v = grafo.listaDeVertices().elemento(i);
+        ListaGenerica<Arista<String>> ady = grafo.listaDeAdyacentes(v);
+        ady.comenzar();
+        while (!ady.fin() && !r.getFin()) {
+            Arista<String> arista = ady.proximo();
+            Vertice<String> vDestino = arista.verticeDestino();
+            listaAux.agregarFinal(vDestino.dato());
+            if (vDestino.dato().equals(ciudad2)) {
+                if (tanqueAuto - (cargaActual + arista.peso()) >= 0) {
+                    r.setListaString(listaAux.clonar());
+                    r.setFin(true);
+                }
+            } else {
+                int j = vDestino.posicion();
+                CombustibleDFS(grafo, ciudad2, j, listaAux, visitados, r, tanqueAuto - arista.peso(), arista.peso());
+                listaAux.eliminarEn(listaAux.tamanio() - 1);
+            }
+        }
+        visitados[i] = false;
+    //    listaAux.eliminarEn(listaAux.tamanio()-1);
     }
 }
