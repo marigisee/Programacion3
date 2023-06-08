@@ -286,8 +286,6 @@ public class Mapa {
             }
             if (encontroCiudad1) {
                 ListaGenerica<String> listaAux = new ListaGenericaEnlazada<>();
-                listaAux.agregarFinal(ciudad1);
-                visitados[i] = true;
                 CombustibleDFS(getMapaCiudades(), ciudad2, i, listaAux, visitados, r, tanqueAuto, 0);
             }
         }
@@ -300,23 +298,24 @@ public class Mapa {
     private void CombustibleDFS (Grafo<String> grafo, String ciudad2, int i, ListaGenerica<String> listaAux, boolean[] visitados, Resultados r,int tanqueAuto,int cargaActual) {
         visitados[i] = true;
         Vertice<String> v = grafo.listaDeVertices().elemento(i);
+        listaAux.agregarFinal(v.dato());
+        if (v.dato().equals(ciudad2)) {
+            if ((tanqueAuto)>=0) {
+                r.setListaString(listaAux.clonar());
+                r.setFin(true);
+                System.out.println("Para el camino:"+listaAux+" el tanque de auto queda en:"+tanqueAuto);
+            }
+        } else {
         ListaGenerica<Arista<String>> ady = grafo.listaDeAdyacentes(v);
         ady.comenzar();
         while (!ady.fin() && !r.getFin()) {
             Arista<String> arista = ady.proximo();
             Vertice<String> vDestino = arista.verticeDestino();
-            listaAux.agregarFinal(vDestino.dato());
-            if (vDestino.dato().equals(ciudad2)) {
-                if (tanqueAuto - (cargaActual + arista.peso()) >= 0) {
-                    r.setListaString(listaAux.clonar());
-                    r.setFin(true);
-                }
-            } else {
-                int j = vDestino.posicion();
-                CombustibleDFS(grafo, ciudad2, j, listaAux, visitados, r, tanqueAuto - arista.peso(), arista.peso());
-                listaAux.eliminarEn(listaAux.tamanio() - 1);
+            int j = vDestino.posicion();
+            CombustibleDFS(grafo, ciudad2, j, listaAux, visitados, r, tanqueAuto - arista.peso(), arista.peso());
             }
         }
+        listaAux.eliminarEn(listaAux.tamanio()-1);
         visitados[i] = false;
     //    listaAux.eliminarEn(listaAux.tamanio()-1);
     }
