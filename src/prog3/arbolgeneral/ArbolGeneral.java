@@ -68,9 +68,73 @@ public class ArbolGeneral<T> {
 		}
 	}
 
+
+	/**
+	 * Recorrido preOrden en un arbol generico:
+	 * 1) Proceso la raiz
+	 * 2) Luego los hijos
+	 * @return
+	 */
 	public ListaGenericaEnlazada<T> preOrden() {
+		System.out.print(this.dato);
+		ListaGenerica<ArbolGeneral<T>> hijos = this.getHijos();
+		hijos.comenzar();
+		while (!hijos.fin()){
+			ArbolGeneral<T> aux = hijos.proximo();
+			aux.preOrden();
+		}
 		return null;
 	}
+
+	/**
+	 * Recorrido inOrder en un arbol general:
+	 * 1) Proceso el primer hijo
+	 * 2) Proceso la raiz
+	 * 3) Proceso el resto de los hijos
+	 * @return
+	 */
+	public ListaGenericaEnlazada<T> inOrden(){
+		if (this.tieneHijos()) {
+			ListaGenerica<ArbolGeneral<T>> hijos = this.getHijos();
+			hijos.comenzar();
+			ArbolGeneral<T> aux = hijos.proximo();
+			aux.inOrden();
+			System.out.print(this.dato);
+			while (!hijos.fin()) {
+				aux = hijos.proximo();
+				aux.inOrden();
+			}
+		}
+		else {
+			System.out.print(this.dato);
+			}
+		return null;}
+
+	/**
+	 * Recorrido postOrden en un arbol general:
+	 * 1)Recorro todos los hijos
+	 * 2)Luego la raiz
+	 * @return
+	 */
+
+	public ListaGenericaEnlazada<T> postOrden(){
+		if (this.tieneHijos()) {
+			ListaGenerica<ArbolGeneral<T>> hijos = this.getHijos();
+			hijos.comenzar();
+			ArbolGeneral<T> aux = hijos.proximo();
+			while (!hijos.fin()){
+				if (aux.esHoja()) {
+					System.out.print(aux.getDato());
+				}
+				else {
+					aux.postOrden();
+				}
+				aux = hijos.proximo();
+			}
+			System.out.print(aux.getDato());
+			System.out.print(this.dato);
+		}
+		return null;}
 
 	/**
 	 * Devuelve la altura del árbol, es decir, la
@@ -213,7 +277,7 @@ public class ArbolGeneral<T> {
 		while (!cola.esVacia()) {
 			arbol = cola.desencolar();
 			if (arbol != null) {
-				System.out.print(arbol.getDato());
+				System.out.print(arbol.getDato()+" ");
 				if (arbol.tieneHijos()) {
 					ListaGenerica<ArbolGeneral<T>> l = arbol.getHijos();
 					while (!l.fin()) {
@@ -222,7 +286,7 @@ public class ArbolGeneral<T> {
 				}
 			} else if (!cola.esVacia()) {
 				cola.encolar(null);
-				System.out.println();
+				System.out.println(" ");
 			}
 		}
 	}

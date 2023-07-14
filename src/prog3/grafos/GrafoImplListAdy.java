@@ -83,6 +83,6 @@ public class GrafoImplListAdy<T> implements Grafo<T> {
 	public Vertice<T> vertice(int posicion) {
 		return this.listaDeVertices().elemento(posicion);
 	}
-	
+
 
 }

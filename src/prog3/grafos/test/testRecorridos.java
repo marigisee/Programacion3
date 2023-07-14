@@ -1,7 +1,7 @@
 package prog3.grafos.test;
 import prog3.grafos.*;
 import prog3.listagenerica.*;
-import prog3.utiles.Recorridos;
+import prog3.practicaGrafos.utiles.Recorridos;
 
 public class testRecorridos {
     public static void main(String[] args) {

@@ -22,8 +22,8 @@ public class ArbolBinario<T> {
 	 * 
 	 */
 
-	public Integer getDato() {
-		return (Integer) dato;
+	public T getDato() {
+		return dato;
 	}
 
 	public void setDato(T dato) {

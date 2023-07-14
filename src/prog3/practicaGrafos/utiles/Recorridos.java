@@ -1,4 +1,4 @@
-package prog3.utiles;
+package prog3.practicaGrafos.utiles;
 import prog3.grafos.*;
 import prog3.listagenerica.*;
 import prog3.util.*;

@@ -5,15 +5,35 @@ public class testArbolGeneral {
         ArbolGeneral<String> a;
         String dato = "9";
         a = crearArbol1();
+        System.out.println("");
+        System.out.println("Recorrido por niveles:");
         a.recorridoPorNiveles();
-        System.out.println();
-        System.out.println("---------");
+        System.out.println(" ");
+        System.out.println("Recorrido preOrden");
+        a.preOrden();
+        System.out.println(" ");
+        System.out.println("Recorrido inOrden");
+        a.inOrden();
+        System.out.println(" ");
+        System.out.println("Recorrido postOrden");
+        a.postOrden();
+        /**
         System.out.println("La altura del arbol gral es:"+a.altura());
         System.out.println("¿Incluye el string:"+dato+"?"+a.include(dato, 0));
         System.out.println("Se encontro en el nivel:"+a.nivel(dato));
         System.out.println("Ancho del arbol:"+a.ancho());
+         **/
     }
 
+    /*
+    *                  0
+    *                /  | \
+    *              1    2  3
+    *           / | | \
+    *          4  5 6  9
+    *            /|
+    *           7 8
+    * */
     public static ArbolGeneral<String> crearArbol1(){
         ArbolGeneral<String> a1 = new ArbolGeneral<String>("1");
         ArbolGeneral<String> a2 = new ArbolGeneral<String>("2");
@@ -37,11 +57,18 @@ public class testArbolGeneral {
         ListaGenerica<ArbolGeneral<String>> hijos3 = new ListaGenericaEnlazada<ArbolGeneral<String>>();
         hijos3.agregarFinal(a7);
         hijos3.agregarFinal(a8);
-        a4.setHijos(hijos3);
+        a5.setHijos(hijos3);
         ArbolGeneral<String> a = new ArbolGeneral<String>("0",
                 hijos);
     return a;}
 
+    /*
+     *                   0
+     *                /  |  \
+     *              1    2   3
+     *           / | |   | \
+     *          4  5 6   7  8
+     * */
     public static ArbolGeneral<String> crearArbol2(){
         ArbolGeneral<String> a1 = new ArbolGeneral<String>("1");
         ArbolGeneral<String> a2 = new ArbolGeneral<String>("2");

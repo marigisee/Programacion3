@@ -1,8 +1,6 @@
 package prog3.problemaCiudades;
 import prog3.listagenerica.*;
 import prog3.grafos.*;
-import prog3.problemaCiudades.*;
-import prog3.utiles.Recorridos;
 
 public class Mapa {
 
@@ -265,16 +263,17 @@ public class Mapa {
 
 
 /**
- * El método caminoSinCargarCombustible(String ciudad1, String ciudad2, int
- * tanqueAuto): ListaGenerica<String> // Retorna la lista de ciudades que forman un camino
+ * Retorna la lista de ciudades que forman un camino
  * para llegar de ciudad1 a ciudad2. El auto no debe quedarse sin combustible y no puede
- * cargar. Si no existe camino retorna la lista vacía
+ * cargar. Si no existe camino retorna la lista vacía.
  */
 
     public ListaGenerica<String> caminoSinCargarCombustible (String ciudad1, String ciudad2, int tanqueAuto) {
         Resultados r = new Resultados();
+        // Si el grafo está vacio, no recorremos nada y devolvemos la lista vacia. //
         if (this.grafo.esVacio()) {
             return r.getListaString();
+        // Si no está vacio, entonces recorremos la lista de vértices del grafo en busqueda de ciudad1 //
         } else {
             boolean[] visitados = new boolean[getMapaCiudades().listaDeVertices().tamanio()];
             boolean encontroCiudad1 = false;
@@ -285,6 +284,7 @@ public class Mapa {
                 } else i++;
             }
             if (encontroCiudad1) {
+                // Si encontramos la ciudad1, nos posicionamos en ella y comenzamos el recorrido DFS desde el vértice que contiene ciudad1 //
                 ListaGenerica<String> listaAux = new ListaGenericaEnlazada<>();
                 CombustibleDFS(getMapaCiudades(), ciudad2, i, listaAux, visitados, r, tanqueAuto, 0);
             }
@@ -292,22 +292,35 @@ public class Mapa {
         return r.getListaString();
     }
 
-    /*
-    *
-    * */
+    /**
+     * CombustibleDFS es el método recursivo en el cual se recorre el grafo en búsqueda del camino desde ciudad1 hasta ciudad2 en el cual el tanque del auto alcanza para realizar el recorrido.
+     *
+     * @param grafo : grafo con el contenido del gasto de combustible entre ciudades
+     * @param ciudad2 : string ciudad2
+     * @param i : posición del vértice actual en la listaDeVertices
+     * @param listaAux : lista auxiliar en el que vamos almacenando el recorrido actual
+     * @param visitados : vector booleano indicador de ciudades visitadas
+     * @param r : objeto de la clase Resultados que contiene el resultado del problema
+     * @param tanqueAuto : integer con el valor del tanque del auto (a medida que va avanzando se va actualizando)
+     * @param cargaActual : el gasto de combustible desde el vértice actual al proximo
+     */
     private void CombustibleDFS (Grafo<String> grafo, String ciudad2, int i, ListaGenerica<String> listaAux, boolean[] visitados, Resultados r,int tanqueAuto,int cargaActual) {
         visitados[i] = true;
         Vertice<String> v = grafo.listaDeVertices().elemento(i);
         listaAux.agregarFinal(v.dato());
+        // Si el dato coincide con la ciudad destino, verificamos las condiciones del tanque del auto //
         if (v.dato().equals(ciudad2)) {
             if ((tanqueAuto)>=0) {
+                //Si llegamos hasta la ciudad destino y nos alcanzó el tanque del auto, copiamos el recorrido //
                 r.setListaString(listaAux.clonar());
                 r.setFin(true);
-                System.out.println("Para el camino:"+listaAux+" el tanque de auto queda en:"+tanqueAuto);
+                //System.out.println("Para el camino:"+listaAux+" el tanque de auto queda en:"+tanqueAuto);
             }
         } else {
+        // Si no es el dato, seguimos recorriendo sus adyacentes en búsqueda de ciudad2 //
         ListaGenerica<Arista<String>> ady = grafo.listaDeAdyacentes(v);
         ady.comenzar();
+        // Recorro los adyacentes y comienzo la recursión //
         while (!ady.fin() && !r.getFin()) {
             Arista<String> arista = ady.proximo();
             Vertice<String> vDestino = arista.verticeDestino();
@@ -315,8 +328,16 @@ public class Mapa {
             CombustibleDFS(grafo, ciudad2, j, listaAux, visitados, r, tanqueAuto - arista.peso(), arista.peso());
             }
         }
+        // Elimino fuera del while porque los profesores quieren que sea asi (?) //
         listaAux.eliminarEn(listaAux.tamanio()-1);
         visitados[i] = false;
     //    listaAux.eliminarEn(listaAux.tamanio()-1);
     }
 }
+
+/**
+ * Retorna la lista de ciudades que forman un camino para llegar de ciudad1 a ciudad2 teniendo en cuenta que el auto debe cargar la menor
+ * cantidad de veces.
+ * El auto no se debe quedar sin combustible en medio de una ruta, además puede completar su tanque al llegar a cualquier ciudad.
+ * Si no existe camino retorna la lista vacía
+ */
